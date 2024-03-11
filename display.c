@@ -1,26 +1,36 @@
 #include <gtk/gtk.h>
 
-int main(int argc, char *argv[]) {
-    // Initialize GTK
-    gtk_init(&argc, &argv);
-
+// Function to set up and show the window
+static void activate(GtkApplication* app, gpointer user_data) {
     // Create a new window
-    GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title(GTK_WINDOW(window), "Hello World");
-    gtk_window_set_default_size(GTK_WINDOW(window), 200, 200);
-    gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
+    GtkWidget *window = gtk_application_window_new(app);
 
-    // Set an app icon
-    GdkPixbuf *icon = gdk_pixbuf_new_from_file("app-icon.png", NULL);
-    gtk_window_set_icon(GTK_WINDOW(window), icon);
+    // Set the window title and default size
+    gtk_window_set_title(GTK_WINDOW(window), "Hello, GTK!");
+    gtk_window_set_default_size(GTK_WINDOW(window), 300, 200);
 
-    // Connect the "destroy" signal of the window to gtk_main_quit
-    g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+    // Create a label widget with a message
+    GtkWidget *label = gtk_label_new("Hello, GTK World!");
 
-    // Show the window
+    // Add the label to the window
+    gtk_container_add(GTK_CONTAINER(window), label);
+
+    // Show all widgets in the window
     gtk_widget_show_all(window);
+}
 
-    // Start the GTK main loop
-    gtk_main();
+int main(int argc, char **argv) {
+    // Create a new GTK application
+    GtkApplication *app = gtk_application_new("com.example.MyApplication", G_APPLICATION_FLAGS_NONE);
 
-    return 0;
+    // Connect the activate signal to the activate function
+    g_signal_connect(app, "activate", G_CALLBACK(activate), NULL);
+
+    // Run the application
+    int status = g_application_run(G_APPLICATION(app), argc, argv);
+
+    // Release resources
+    g_object_unref(app);
+
+    return status;
+}
