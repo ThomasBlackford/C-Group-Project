@@ -57,10 +57,19 @@ int main() {
         }
 
         // Receive the reply from the server
-        if (recv(s, server_reply, 2000, 0) < 0) {
-            puts("recv failed");
-            break;
+        int bytes_received = 0;
+        while (bytes_received < sizeof(server_reply)) {
+            int ret = recv(s, server_reply + bytes_received, sizeof(server_reply) - bytes_received, 0);
+            if (ret < 0) {
+                puts("recv failed");
+                break;
+            } else if (ret == 0) {
+                // Connection closed by the server
+                break;
+            }
+            bytes_received += ret;
         }
+        server_reply[bytes_received] = '\0'; // Null-terminate the received message
 
         printf("Server reply (%s): %s\n", server_ip, server_reply);
     }
